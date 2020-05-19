@@ -25,10 +25,11 @@ const zeroPadded = num => (num < 10) ? `0${num}` : num;
 
 /* Card Class --- */
 class Card {
-  constructor(id, characterName, src) {
+  constructor(id, symbolName, src, meaning) {
     this.id = id;
-    this.characterName = characterName;
+    this.symbolName = symbolName;
     this.src = src;
+    this.meaning = meaning;
   }
 }
 
@@ -37,22 +38,30 @@ class Card {
   ==================================== */
 const model = {
   cards: [
-    new Card(1, 'Panana', 'images/vegetables.png'), // id, name and src
-    new Card(1, 'Panana', 'images/vegetables.png'), 
-    new Card(2, 'Peanut', 'images/peanut.png'),
-    new Card(2, 'Peanut', 'images/peanut.png'),
-    new Card(3, 'Pineapple', 'images/bread.png'),
-    new Card(3, 'Pineapple', 'images/bread.png'),
-    new Card(4, 'Tomato', 'images/tomato.png'),
-    new Card(4, 'Tomato', 'images/tomato.png'),
-    new Card(5, 'Chocolate', 'images/chocolate.png'),
-    new Card(6, 'Cookies', 'images/cookies.png'),
-    new Card(7, 'Junk', 'images/junk.png'),
-    new Card(8, 'Junk2', 'images/junk2.png'),
-    new Card(9, 'Pepsi', 'images/pepsi.png'),
-    new Card(10, 'Sweets', 'images/sweets.png'),
-    new Card(11, 'Sweets2', 'images/sweets2.png'),
-    new Card(12, 'Sweets3', 'images/sweets3.png'),
+    new Card(1, 'Ankh', 'images/ankh.jpg',
+      'The ankh represents the concept of eternal life. It frequently appears in Egyptian tomb paintings and other art.'
+    ), // id, name, src, meaning
+    new Card(2, 'Djed', 'images/djed.jpg',
+      'Djed is for stability. It was primarily associated with themes of rebirth and regeneration.'
+    ), 
+    new Card(3, 'Wadjet Eye', 'images/wadjet-eye.jpg', 
+      'It was known as a slogan to protect against envy, disease, harmful animals and evil spirits.'
+    ),
+    new Card(4, 'Was Sceptre', 'images/was-sceptre.jpg', 
+      'It was the symbol of power in ancient Egyptian culture. It also represented the dominion of gods.'
+    ),
+    new Card(5, 'Feather Of Maat', 'images/feather-of-maat.jpg', 
+      'Named after the goddess Maat who represented justice in Egyptian culture.'
+    ),
+    new Card(6, 'Egyptian Ouroboros', 'images/ouroboros.jpg', 
+      'One of the symbols of the sun, as it represented the journeys of Aten, the solar disk in Egyptian mythology.'
+    ),
+    new Card(7, 'BA symbol', 'images/ba-symbol.jpg', 
+      'Human personality in the spirit world. Conceived in the form of a bird with a human head carrying the features of the deceased person and spirit where she leaves the body after death to the sky where she lives in the stars'
+    ),
+    new Card(8, 'Amenta', 'images/amenta.jpg', 
+      'Amenta symbol represents the land of the dead (the earthly world).'
+    )
   ],
   selectedId: null,
   firstClick: true,
@@ -141,6 +150,9 @@ const octopus = {
   closeDialog() {
     modalView.closeDialog();
   },
+  updateSymbol() {
+    symbol.render()
+  },
   reset(focusedIndex) {
     model.moves = 0;
     model.stars = 3;
@@ -150,6 +162,7 @@ const octopus = {
     model.selectedId = null;
     model.firstClick = true;
     boardView.reset();
+    symbol.reset();
 
     // Render
     movesView.render();
@@ -168,6 +181,7 @@ const octopus = {
     rulesView.init();
     gameStatus.init();
     modalView.init();
+    symbol.init();
   }
 }
 
@@ -323,7 +337,10 @@ const boardView = {
 
         const card = (target.nodeName === 'LI') ? target.querySelector('button')
         : (target.nodeName === 'BUTTON') ? target
+        : (target.nodeName === 'IMG') ? target.parentNode.parentNode
         : target.parentNode; // target: <div class="front"> inside button
+        console.log(card);
+
         const currentId = card.getAttribute('data-id');
         const firstId = octopus.getSelectedId();
 
@@ -371,6 +388,7 @@ const boardView = {
       this.flashMatching(matchedCards); // Visiual feedback first
       this.trueDataMatchedAttr(matchedCards);
       this.checkWin();
+      octopus.updateSymbol();
     } else {
       const unmatchedCards = this.cards.filter(card => (card.getAttribute('aria-selected') === 'true') && (card.getAttribute('data-matched') === 'false'));
       octopus.updateMatchingResult('different');
@@ -391,6 +409,9 @@ const boardView = {
         this.backgroundWhite(matchedCards);
         window.setTimeout(() => {
           this.backgroundGreen(matchedCards);
+          window.setTimeout(() => {
+            this.backgroundWhite(matchedCards);
+          }, flashTime);
         }, flashTime);
       }, flashTime);
     }, cardShowingTime)
@@ -413,13 +434,13 @@ const boardView = {
     }, cardShowingTime)
   },
   backgroundRed(cards) {
-    cards.forEach(card => card.style.backgroundColor = '#FCB8B8');
+    cards.forEach(card => card.querySelector('.back').setAttribute('data-overlay', 'red'));
   },
   backgroundGreen(cards) {
-    cards.forEach(card => card.style.backgroundColor = '#B8FCC0');
+    cards.forEach(card => card.querySelector('.back').setAttribute('data-overlay', 'green'));
   },
   backgroundWhite(cards) {
-    cards.forEach(card => card.style.backgroundColor = 'white');
+    cards.forEach(card => card.querySelector('.back').setAttribute('data-overlay', 'trans'));
   },
   trueDataMatchedAttr(matchedCards) {
     matchedCards.forEach(card => card.setAttribute('data-matched', 'true'));
@@ -431,13 +452,13 @@ const boardView = {
     unmatchedCards.forEach(card => card.setAttribute('aria-selected', false));
   },
   checkWin() {
-    const allMatched = this.cards.filter(card => card.getAttribute('data-matched') === 'true').length === 8;
+    const allMatched = this.cards.every(card => card.getAttribute('data-matched') === 'true');
     if (allMatched) {
       octopus.updateMatchingResult('Done');
       octopus.stopTimer();
       setTimeout(() => {
         octopus.openDialog();
-      }, 300); // Card opening time
+      }, 300 + 1000); // Card opening time: 300
     }
   },
   reset() {
@@ -512,18 +533,22 @@ const boardView = {
     this.rows.forEach(row => row.querySelector('ul').removeAll());
     const fragment = document.createDocumentFragment();
     let rowIndex = 0;
-    const cards = octopus.getCards().shuffle();
+    const cards = octopus.getCards().repeat(2).shuffle();
     cards.forEach((card, index) => {
       const listItem = document.createElement('li');
       listItem.classList.add('card');
       if (index === 0) { // Only the first card will be in the tab sequence
         listItem.innerHTML = `<button type="button" data-matched="false" role="gridcell" aria-selected="false" aria-label="card ${index+1}" data-id="${card.id}" data-num="${index}" data-name="${card.characterName}">
-          <img src="${card.src}" alt="Anime Character" class="back">
+          <div class="back">
+            <img src="${card.src}" alt="Anime Character" class="backImage">
+          </div>
           <div class="front"></div>
         </button>`;
       } else { // tabindex="-1"
         listItem.innerHTML = `<button type="button" data-matched="false" role="gridcell" aria-selected="false" aria-label="card ${index+1}" data-id="${card.id}" tabindex="-1" data-num="${index}" data-name="${card.characterName}">
-          <img src="${card.src}" alt="Anime Character" class="back">
+          <div class="back">
+            <img src="${card.src}" alt="Anime Character" class="backImage">
+          </div>
           <div class="front"></div>
         </button>`;
       }
@@ -612,6 +637,32 @@ const modalView = {
     const moves = octopus.getMovesRecord();
     const resultStr = this.generateResultStr(moves, seconds, minutes);
     this.movesAndTime.textContent = resultStr;
+  }
+}
+
+/* Meaning window --- */
+const symbol = {
+  init() {
+    this.parent = document.querySelector('.board-section');
+  },
+  reset() {
+    const symbol = document.querySelector('.symbol');
+    if (symbol) symbol.remove();
+  },
+  render() {
+    this.reset();
+    const cardId = octopus.getSelectedId();
+    const cards = octopus.getCards();
+    const { symbolName, src, meaning } = cards.find(card => card.id == cardId);
+
+    const html = `
+      <div class="symbol">
+        <img class="symbol__image" src="${src}" alt="">
+        <h2 class="symbol__name">${symbolName}</h2>
+        <p class="symbol__meaning">${meaning}</p>
+      </div>
+    `;
+    this.parent.insertAdjacentHTML('beforeend', html);
   }
 }
 

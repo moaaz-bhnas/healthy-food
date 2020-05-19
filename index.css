@@ -13,10 +13,10 @@
   
   html {
     font-size: 105%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    color: #275858;
-    background-color: #cae7e7;
-    font-weight: bold;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.4;
+    color: #6D583B;
+    background-color: #F4F0E3;
     position: relative;
   }
   
@@ -155,7 +155,7 @@
     padding: .5rem;
     border: 2.5px solid;
     border-radius: 1rem;
-    background-color: #cdc2be;
+    background-color: #9bb8c4;
     position: relative;
     top: -.5rem;
   }
@@ -206,14 +206,14 @@
   
   ul#state .stars {
     padding: .3rem .3rem .5rem;
-    border-color: #275858;
+    border-color: #6D583B;
   }
   
   .stars-list {
     list-style: none;
     margin: 0;
     padding-left: 0;
-    color: #6e701f;
+    color: #787259;
     font-size: 2rem;
   }
   
@@ -227,7 +227,7 @@
     padding: .5rem;
     border: 2.5px solid;
     border-radius: 1rem;
-    background-color: #cdc2be;
+    background-color: #9bb8c4;
   }
   
   .reset:hover,
@@ -266,9 +266,10 @@
   .board-section {
     padding: 0.5rem 0.5rem;
     text-align: center;
+    position: relative;
   }
   
-  .board-section h2 {
+  .board-section > h2 {
     position: absolute;
     left: -200rem;
   }
@@ -279,7 +280,7 @@
   }
   
   .board {
-    background-color: #60b8b8;
+    background-color: #F4E19F;
     list-style: none;
     margin: 0;
     padding-left: 0;
@@ -312,6 +313,7 @@
     margin: 0 1.5%;
     display: inline-block;
     vertical-align: middle;
+    position: relative;
   }
   
   .card button {
@@ -335,7 +337,7 @@
   
   .card button:hover .front,
   .card button:focus .front {
-    background-color: #527979;
+    background-color: #ed9186;
   }
   
   .card button:active {
@@ -349,7 +351,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    background-color: #275858;
+    background-color: #e97568;
     border-radius: 0.5rem;
     -webkit-transition-property: background-color;
     transition-property: background-color;
@@ -369,16 +371,48 @@
     transition: -webkit-transform 0.55s cubic-bezier(0.59, 1.39, 0.6, 1.01), -webkit-box-shadow 0.1s;
     transition: transform 0.55s cubic-bezier(0.59, 1.39, 0.6, 1.01), box-shadow 0.1s;
     transition: transform 0.55s cubic-bezier(0.59, 1.39, 0.6, 1.01), box-shadow 0.1s, -webkit-transform 0.55s cubic-bezier(0.59, 1.39, 0.6, 1.01), -webkit-box-shadow 0.1s;
+    position: relative;
   }
   
-  .board .front {
+  .front {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    border-radius: .5em;
   }
   
-  .board .back {
+  .back {
     -webkit-transform: rotateY(-180deg);
     transform: rotateY(-180deg);
+
+    width: 100%;
+    height: 100%;
+    border-radius: .5em;
+  }
+
+  .back::after {
+    content: '';
+    position: absolute;
+    top: -.1em; bottom: -.1em; left: -.1em; right: -.1em;
+    background-color: transparent;
+    opacity: .4;
+    border-radius: .5em;
+  }
+
+  .back[data-overlay="red"]::after {
+    background-color: #f80000;
+  }
+  .back[data-overlay="green"]::after {
+    background-color: #00b300;
+  }
+  .back[data-overlay="trans"]::after {
+    background-color: transparent;
+  }
+
+  .backImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: .5em;
   }
   
   .board [aria-selected="true"] {
@@ -436,6 +470,31 @@
   .no-csstransforms #result-modal {
     top: 30%;
     left: 39%;
+  }
+
+  .symbol {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    width: 13.5em;
+    background-color: #fff;
+    padding: 1em;
+    border-radius: 1em;
+    border: 2.5px solid;
+  }
+
+  .symbol__image {
+    width: 8em;
+  }
+
+  .symbol__name {
+    font-size: 1.3rem;
+    margin: .2em 0 .4em 0;
+  }
+
+  .symbol__meaning {
+    margin: 0;
   }
   
   @media screen and (min-width: 410px) {
