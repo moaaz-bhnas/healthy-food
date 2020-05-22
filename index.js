@@ -269,7 +269,7 @@ const timerView = {
   },
   render() {
     const {seconds, minutes} = octopus.getTime();
-    const timeString = `${zeroPadded(seconds)}:${zeroPadded(minutes)}`;
+    const timeString = `${zeroPadded(minutes)}:${zeroPadded(seconds)}`;
     this.timer.textContent = timeString;
   }
 }
